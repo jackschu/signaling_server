@@ -1,0 +1,29 @@
+{
+  "name": "signaling-server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.2",
+    "@types/uuid": "^9.0.7",
+    "aws-cdk-lib": "2.101.1",
+    "constructs": "10.2.69",
+    "sst": "^2.35.0",
+    "typescript": "^5.2.2"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "uuid": "^9.0.1",
+    "zoo-ids": "^2.0.7"
+  }
+}
