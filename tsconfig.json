@@ -1,9 +1,12 @@
 {
-  "extends": "@tsconfig/node18/tsconfig.json",
-  "exclude": ["packages"],
-  "compilerOptions": {
-    "module": "esnext",
-    "moduleResolution": "node"
-  },
-  "include": ["decs.d.ts"]
+    "extends": "@tsconfig/node18/tsconfig.json",
+    "exclude": ["packages"],
+    "compilerOptions": {
+        "module": "esnext",
+        "moduleResolution": "node"
+    },
+    "paths": {
+        "@/*": ["./src/*"]
+    },
+    "include": ["decs.d.ts", "**/*.ts"]
 }

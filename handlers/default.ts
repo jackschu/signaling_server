@@ -12,7 +12,7 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
 
     console.log(body)
     if (body === 'KeepAlive') return out
-    const TableName: string = (Table as any).Connections.tableName
+    const TableName: string = Table.Connections.tableName
     const connectionId = event.requestContext.connectionId
 
     const others = await dynamoDb
@@ -32,12 +32,8 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
     const apiG = new ApiGatewayManagementApi({
         endpoint: `${domainName}/${stage}`,
     })
-    // if ('IceCandidate' in body.Signal.data) {
-    //     console.log('delaying answer')
-    //     await new Promise((resolve) => setTimeout(resolve, 3000))
-    // }
 
-    const mapped = others.Items.map((attrs: Record<string, unknown>) => {
+    const mapped = (others.Items ?? []).map((attrs: Record<string, unknown>) => {
         if (!('connectionId' in attrs) || typeof attrs.connectionId !== 'string')
             throw new Error('no connectionId')
         if (!('peerUUID' in attrs) || typeof attrs.peerUUID !== 'string')
@@ -49,6 +45,9 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
 
     const initialConnectionId = connectionId
     const myUUID = mapped.find((x) => x.connectionId === initialConnectionId)
+    if (myUUID === undefined) {
+        return { statusCode: 400, body: 'failed to find current connection in db' }
+    }
     const postToConnection = async function ({
         connectionId,
         peerUUID,
@@ -76,11 +75,10 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
                 await dynamoDb.delete({ TableName, Key: { connectionId } }).promise()
             } else {
                 console.log('error', e)
-                //   throw e
+                throw e
             }
         }
     }
-    console.log(mapped)
     await Promise.all((mapped ?? []).map(postToConnection))
     return out
 })

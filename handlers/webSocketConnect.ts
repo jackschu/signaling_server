@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from 'uuid'
 const dynamoDb = new DynamoDB.DocumentClient()
 
 export const main = WebSocketApiHandler(async (event, _ctx) => {
-    const init_lambda: string = (Function as any).MyFunction.functionName
-    const TableName: string = (Table as any).Connections.tableName
+    const init_lambda: string = Function.MyFunction.functionName
+    const TableName: string = Table.Connections.tableName
     const connectionId = event.requestContext.connectionId
     const uuid = uuidv4()
 
