@@ -59,8 +59,6 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
             return
         }
         try {
-            console.log('posting data', connectionId, peerUUID)
-
             await apiG
                 .postToConnection({
                     ConnectionId: connectionId,
