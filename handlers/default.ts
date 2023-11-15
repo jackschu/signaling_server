@@ -14,8 +14,15 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
     if (body === 'KeepAlive') return out
     const TableName: string = Table.Connections.tableName
     const connectionId = event.requestContext.connectionId
+    let own_record_result = await dynamoDb.get({ TableName, Key: { connectionId } }).promise()
+    if (!own_record_result.Item) throw new Error(`Failed to find own key ${connectionId}`)
+    const own_record = own_record_result.Item
+    if (!('roomId' in own_record) || typeof own_record.roomId !== 'string')
+        throw new Error('no roomId')
+    const own_room_id = own_record.roomId
 
-    const others = await dynamoDb
+    console.log('got own room id', own_room_id)
+    const other_records = await dynamoDb
         .scan({
             TableName,
             ProjectionExpression: 'connectionId,peerUUID',
@@ -24,7 +31,7 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
             // // Define the expression attribute value, which are substitutes for the values you want to compare.
             ExpressionAttributeValues: {
                 //                ':mine': incomingUserId ,
-                ':roomid': '',
+                ':roomid': own_room_id,
             },
         })
         .promise()
@@ -33,7 +40,7 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
         endpoint: `${domainName}/${stage}`,
     })
 
-    const mapped = (others.Items ?? []).map((attrs: Record<string, unknown>) => {
+    const mapped = (other_records.Items ?? []).map((attrs: Record<string, unknown>) => {
         if (!('connectionId' in attrs) || typeof attrs.connectionId !== 'string')
             throw new Error('no connectionId')
         if (!('peerUUID' in attrs) || typeof attrs.peerUUID !== 'string')
@@ -50,7 +57,6 @@ export const main = WebSocketApiHandler(async (event, _ctx) => {
     }
     const postToConnection = async function ({
         connectionId,
-        peerUUID,
     }: {
         connectionId: string
         peerUUID: string

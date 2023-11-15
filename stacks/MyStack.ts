@@ -9,6 +9,8 @@ export function API({ stack }: StackContext) {
             connectionPayload: 'string',
             roomId: 'string',
             roomSize: 'number',
+            isNarrowRoom: 'number',
+            matchmade: 'number',
             expireAt: 'number',
         },
         timeToLiveAttribute: 'expireAt',
@@ -33,7 +35,7 @@ export function API({ stack }: StackContext) {
         },
         routes: {
             $connect: 'handlers/webSocketConnect.main',
-            // $disconnect: 'packages/functions/src/webSocketDisconnect.main',
+            $disconnect: 'handlers/webSocketDisconnect.main',
             $default: 'handlers/default.main',
         },
     })
