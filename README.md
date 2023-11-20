@@ -21,6 +21,10 @@ Here we use it to provision one stack with several AWS resources, primarily:
 2. 4x lambda handers in `/handlers/`
 3. A websocket-based AWS API Gateway, which invokes a lambda on every message
 
-These resources work together to create pub-sub-esque 'rooms' for clients to connect to. 
+These resources work together to create pub-sub-esque 'rooms' for clients to connect to.
+
 These rooms are used to send enough 'signals' through the signaling server until they can establish a WebRTC connection to each other.
+
+Here's an example of how communications move through each of the 4 lambdas:
+
 ![Architecture Diagram](./docs/Architecture.png)
