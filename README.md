@@ -2,7 +2,7 @@
 
 This project provides a 'signaling server' for the [matchbox](https://github.com/johanhelsing/matchbox) WebRTC project.
 
-The server is composed of AWS-lambdas and a backing dynamoDB table for state.
+The server is composed of AWS-lambdas and a backing DynamoDB table for state.
 
 ## Getting started:
 1. Setup [SST](https://docs.sst.dev/setting-up-aws) to deploy to AWS.
@@ -13,3 +13,14 @@ The server is composed of AWS-lambdas and a backing dynamoDB table for state.
 Notes / caveats: 
 1. SST's local lambda dev may be oom-killed if your clients are too quick, either start clients more slowly or run `npx sst deploy --stage=prod` to handle the load
 2. Currently the default room size is assumed to be 2.
+
+## How it works:
+SST is this project's terraform-like infrastructure as code tool. It provisions using AWS's CDK in units called 'Stacks'
+Here we use it to provision one stack with several AWS resources, primarily:
+1. A DynamoDB 'connections' table
+2. 4x lambda handers in `/handlers/`
+3. A websocket-based AWS API Gateway, which invokes a lambda on every message
+
+These resources work together to create pub-sub-esque 'rooms' for clients to connect to. 
+These rooms are used to send enough 'signals' through the signaling server until they can establish a WebRTC connection to each other.
+![Architecture Diagram](./docs/Architecture.png)
